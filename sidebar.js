@@ -21,10 +21,24 @@ async function analyze(text) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ text: text.slice(0, 40000) })
         });
+        let j;
         if (!resp.ok) {
-            throw new Error(Server responded with status: ${resp.status});
+            let errorMsg = `Server responded with status: ${resp.status}`;
+            try {
+                const errJson = await resp.json();
+                errorMsg += errJson.error ? `\n${errJson.error}` : '';
+                errorMsg += errJson.details ? `\nDetails: ${errJson.details}` : '';
+            } catch {
+                const errText = await resp.text();
+                errorMsg += `\n${errText.slice(0, 200)}`;
+            }
+            document.getElementById('status').innerText = errorMsg;
+            document.getElementById('summary').innerHTML = '';
+            document.getElementById('clauseList').innerHTML = '';
+            return;
+        } else {
+            j = await resp.json();
         }
-        const j = await resp.json();
         document.getElementById('status').innerText = '';
         document.getElementById('summary').innerHTML = '<h3>Summary</h3><p>' + escapeHtml(j.summary || 'No summary provided.') + '</p>';
         const list = document.getElementById('clauseList');
@@ -42,6 +56,8 @@ async function analyze(text) {
     } catch (e) {
         console.error("Analysis error:", e);
         document.getElementById('status').innerText = 'Analysis error. Please check the server.';
+        document.getElementById('summary').innerHTML = '';
+        document.getElementById('clauseList').innerHTML = '';
     }
 }
 
@@ -56,7 +72,17 @@ document.getElementById('ask').addEventListener('click', async () => {
             body: JSON.stringify({ text: lastText, question: q })
         });
         if (!resp.ok) {
-            throw new Error(Server responded with status: ${resp.status});
+            let errorMsg = `Server responded with status: ${resp.status}`;
+            try {
+                const errJson = await resp.json();
+                errorMsg += errJson.error ? `\n${errJson.error}` : '';
+                errorMsg += errJson.details ? `\nDetails: ${errJson.details}` : '';
+            } catch {
+                const errText = await resp.text();
+                errorMsg += `\n${errText.slice(0, 200)}`;
+            }
+            document.getElementById('answer').innerText = errorMsg;
+            return;
         }
         const j = await resp.json();
         document.getElementById('answer').innerText = j.answer || 'No answer found.';

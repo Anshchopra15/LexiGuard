@@ -19,6 +19,19 @@ app.get('/', (req, res) => {
     res.send('LexiGuard server is live!');
 });
 
+function extractValidJson(raw) {
+    let str = raw.trim();
+    // Remove Markdown code block markers
+    if (str.startsWith('```json')) {
+        str = str.replace(/^```json/, '').replace(/```$/, '').trim();
+    } else if (str.startsWith('```')) {
+        str = str.replace(/^```/, '').replace(/```$/, '').trim();
+    }
+    // Try to find JSON object inside stray text
+    const match = str.match(/{[\s\S]*}/);
+    return match ? match[0] : str;
+}
+
 app.post('/analyze', async (req, res) => {
     try {
         const text = req.body.text || '';
@@ -28,9 +41,16 @@ app.post('/analyze', async (req, res) => {
         const prompt = `You are LexiGuard, an AI legal assistant. Analyze the following legal text. Summarize it in simple terms (max 5 sentences). Then, extract up to 5 critical clauses. For each clause, provide a title, a short excerpt from the text, and a risk level (high, mid, or low). ALWAYS format your entire response as a single, valid JSON object with two keys: "summary" (a string) and "clauses" (an array of objects, where each object has "title", "excerpt", and "risk" keys). Do not include any text or formatting outside of this JSON object. Legal Text:\n${text}\n`;
         const result = await model.generateContent(prompt);
         const response = await result.response;
-        const raw = response.text();
-        const cleanedJsonString = raw.replace(/^```json\s*|```$/g, '');
-        res.json(JSON.parse(cleanedJsonString));
+        const raw = await response.text();
+        let cleanedJsonString = extractValidJson(raw);
+        let parsed;
+        try {
+            parsed = JSON.parse(cleanedJsonString);
+        } catch (jsonErr) {
+            console.error("JSON parse error:", jsonErr, "Raw output:", raw);
+            return res.status(500).json({ error: "AI returned malformed JSON.", details: raw });
+        }
+        res.json(parsed);
     } catch (e) {
         console.error("Error in /analyze:", e);
         res.status(500).json({ error: "Failed to analyze text.", details: e.message });
@@ -46,7 +66,7 @@ app.post('/ask', async (req, res) => {
         const prompt = `Based *only* on the legal text provided below, answer the user's question. Be concise and clear. If the answer is not in the text, say so. Legal Text:\n${text}\n\nQuestion: ${question}`;
         const result = await model.generateContent(prompt);
         const response = await result.response;
-        const answer = response.text();
+        const answer = await response.text();
         res.json({ answer });
     } catch (e) {
         console.error("Error in /ask:", e);
