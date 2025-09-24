@@ -1,24 +1,30 @@
 {
-"manifest_version": 3,
-"name": "LexiGuard (Hackathon Prototype)",
-"version": "0.1.0",
-"description": "Summarize and risk-score legal text in-page (prototype).",
-"permissions": ["activeTab","scripting","storage"],
-"host_permissions": ["<all_urls>"],
-"action": {
-"default_title": "LexiGuard",
-"default_popup": "popup.html"
-},
-"content_scripts": [
-{
-"matches": ["<all_urls>"],
-"js": ["content_script.js"],
-"run_at": "document_idle"
-}
-],
-"icons": {
-"16": "icons/checklist.png",
-"48": "icons/checklist.png",
-"128": "icons/checklist.png"
-}
+  "manifest_version": 3,
+  "name": "LexiGuard (Hackathon Prototype)",
+  "version": "0.1.0",
+  "description": "Summarize and risk-score legal text in-page (prototype).",
+  "permissions": ["activeTab", "scripting", "storage"],
+  "host_permissions": ["https://*/*", "http://*/*"],
+  "action": {
+    "default_title": "LexiGuard",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://*/*", "http://*/*"],
+      "js": ["content_script.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["sidebar.html", "icons/checklist.png"],
+      "matches": ["https://*/*", "http://*/*"]
+    }
+  ],
+  "icons": {
+    "16": "icons/checklist.png",
+    "48": "icons/checklist.png",
+    "128": "icons/checklist.png"
+  }
 }

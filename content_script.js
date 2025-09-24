@@ -1,5 +1,3 @@
-// content_script.js (Corrected Version)
-
 (function() {
     if (window.__lexiguard_injected) return;
     window.__lexiguard_injected = true;
@@ -19,16 +17,17 @@
     document.documentElement.appendChild(iframe);
 
     chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-        // Message from the popup/background to toggle the sidebar
         if (msg.type === 'TOGGLE_SIDEBAR') {
             iframe.style.display = (iframe.style.display === 'none') ? 'block' : 'none';
         }
+        return true;
+    });
 
-        // Message from the iframe telling us it's ready for data
-        if (msg.type === 'SIDEBAR_READY') {
+    window.addEventListener('message', (event) => {
+        if (event.source !== iframe.contentWindow) return;
+        if (event.data?.type === 'SIDEBAR_READY') {
             analyzePageText();
         }
-        return true; // Recommended for async message handling
     });
 
     function analyzePageText() {
@@ -45,7 +44,6 @@
             text = document.body.innerText.slice(0, 40000);
         }
 
-        // Also, it's safer to specify the target origin instead of '*'
         iframe.contentWindow.postMessage({ type: 'PAGE_TEXT', text: text }, chrome.runtime.getURL(''));
     }
 })();
