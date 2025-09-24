@@ -1,16 +1,11 @@
-// sidebar.js
-
 let lastText = '';
 
-// Tell the content script that the sidebar is ready
 window.parent.postMessage({ type: 'SIDEBAR_READY' }, '*');
 
-// Listen for messages (e.g., from the content script)
 window.addEventListener('message', async (ev) => {
     if (ev.source !== window.parent) {
         return;
     }
-
     const msg = ev.data || {};
     if (msg.type === 'PAGE_TEXT') {
         lastText = msg.text || '';
@@ -21,22 +16,19 @@ window.addEventListener('message', async (ev) => {
 
 async function analyze(text) {
     try {
-        const resp = await fetch('https://lexiguard-two.vercel.app/api/analyze', {
+        const resp = await fetch('https://lexiguard-two.vercel.app/analyze', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text: text.slice(0, 15000) })
+            body: JSON.stringify({ text: text.slice(0, 40000) })
         });
         if (!resp.ok) {
             throw new Error(`Server responded with status: ${resp.status}`);
         }
         const j = await resp.json();
-
-        document.getElementById('status').innerText = 'Analysis complete.';
+        document.getElementById('status').innerText = '';
         document.getElementById('summary').innerHTML = '<h3>Summary</h3><p>' + escapeHtml(j.summary || 'No summary provided.') + '</p>';
-        
         const list = document.getElementById('clauseList');
         list.innerHTML = '<h3>Key Clauses</h3>';
-        
         if (j.clauses && j.clauses.length > 0) {
             j.clauses.forEach(c => {
                 const d = document.createElement('div');
@@ -47,19 +39,15 @@ async function analyze(text) {
         } else {
             list.innerHTML += '<p>No specific clauses were extracted.</p>';
         }
-
     } catch (e) {
-    console.error("Analysis error:", e);
-    document.getElementById('status').innerText = 'Server error. Try with a shorter document or check backend logs.';
-}
-    document.getElementById('status').innerText = 'Ready.';
+        console.error("Analysis error:", e);
+        document.getElementById('status').innerText = 'Analysis error. Please check the server.';
     }
 }
 
 document.getElementById('ask').addEventListener('click', async () => {
     const q = document.getElementById('question').value.trim();
     if (!q) return;
-
     document.getElementById('answer').innerText = 'Thinking...';
     try {
         const resp = await fetch('https://lexiguard-two.vercel.app/ask', {

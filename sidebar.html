@@ -1,9 +1,9 @@
 <!doctype html>
 <html>
 <head>
-<meta charset="utf-8" />
-<title>LexiGuard Sidebar</title>
-<style>
+  <meta charset="utf-8" />
+  <title>LexiGuard Sidebar</title>
+  <style>
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; padding: 12px; font-size: 14px; color: #333; }
     h3 { margin-top: 0; }
     #status { font-style: italic; color: #666; }
@@ -11,28 +11,22 @@
     .clause.high { border-color: #e53935; }
     .clause.mid { border-color: #fdd835; }
     .clause.low { border-color: #43a047; }
-    strong { font-size: 15px; }
     textarea { width: 95%; padding: 8px; margin-top: 8px; border: 1px solid #ccc; border-radius: 4px; }
     button { padding: 8px 12px; border: none; background-color: #007bff; color: white; border-radius: 4px; cursor: pointer; }
     #answer { margin-top: 8px; white-space: pre-wrap; background: #eee; padding: 10px; border-radius: 4px; }
-</style>
+  </style>
 </head>
 <body>
-
-<h3>LexiGuard Analysis</h3>
-<div id="status">Waiting for page text...</div>
-<hr>
-
-<div id="summary"></div>
-<div id="clauseList"></div>
-
-<hr>
-<h3>Ask a Question</h3>
-<textarea id="question" rows="3" placeholder="e.g., What is the governing law?"></textarea>
-<button id="ask">Ask</button>
-<div id="answer" style="margin-top:8px"></div>
-
-<script src="sidebar.js"></script>
-
+  <h3>LexiGuard Analysis</h3>
+  <div id="status">Waiting for page text...</div>
+  <hr>
+  <div id="summary"></div>
+  <div id="clauseList"></div>
+  <hr>
+  <h3>Ask a Question</h3>
+  <textarea id="question" rows="3" placeholder="e.g., What is the governing law?"></textarea>
+  <button id="ask">Ask</button>
+  <div id="answer" style="margin-top:8px"></div>
+  <script src="sidebar.js"></script>
 </body>
 </html>

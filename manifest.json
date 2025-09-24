@@ -4,22 +4,22 @@
   "version": "0.1.0",
   "description": "Summarize and risk-score legal text in-page (prototype).",
   "permissions": ["activeTab", "scripting", "storage"],
-  "host_permissions": ["https://*/*", "http://*/*"],
+  "host_permissions": ["<all_urls>"],
   "action": {
     "default_title": "LexiGuard",
     "default_popup": "popup.html"
   },
   "content_scripts": [
     {
-      "matches": ["https://*/*", "http://*/*"],
+      "matches": ["<all_urls>"],
       "js": ["content_script.js"],
       "run_at": "document_idle"
     }
   ],
   "web_accessible_resources": [
     {
-      "resources": ["sidebar.html", "icons/checklist.png"],
-      "matches": ["https://*/*", "http://*/*"]
+      "resources": ["sidebar.html"],
+      "matches": ["<all_urls>"]
     }
   ],
   "icons": {

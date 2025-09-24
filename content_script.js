@@ -20,14 +20,11 @@
         if (msg.type === 'TOGGLE_SIDEBAR') {
             iframe.style.display = (iframe.style.display === 'none') ? 'block' : 'none';
         }
-        return true;
-    });
 
-    window.addEventListener('message', (event) => {
-        if (event.source !== iframe.contentWindow) return;
-        if (event.data?.type === 'SIDEBAR_READY') {
+        if (msg.type === 'SIDEBAR_READY') {
             analyzePageText();
         }
+        return true;
     });
 
     function analyzePageText() {
@@ -43,7 +40,6 @@
         if (!text) {
             text = document.body.innerText.slice(0, 40000);
         }
-
         iframe.contentWindow.postMessage({ type: 'PAGE_TEXT', text: text }, chrome.runtime.getURL(''));
     }
 })();
